@@ -30,14 +30,14 @@ export default {
 }
 </script>
 
-<style lang="scss">
-// Colors
-$bg-color: white;
-$dot-color: black;
-
-// Dimensions
-$dot-size: 1px;
-$dot-space: 15px;
+<style lang="css">
+:root {
+    /* Desginer */
+    --designer-grid-bg-color: white;
+    --designer-grid-dot-color: black;
+    --designer-grid-dot-size: 1px;
+    --designer-grid-dot-space: 5mm;
+}
 
 .designer {
     background-color: #e0e0e0;
@@ -72,13 +72,26 @@ $dot-space: 15px;
     flex-direction: column;
     background: linear-gradient(
                 90deg,
-                white ($dot-space - $dot-size),
+                var(--designer-grid-bg-color)
+                    calc(
+                        var(--designer-grid-dot-space) -
+                            var(--designer-grid-dot-size)
+                    ),
                 transparent 1%
             )
             left,
-        linear-gradient($bg-color ($dot-space - $dot-size), transparent 1%) top,
-        $dot-color;
-    background-size: $dot-space $dot-space;
+        linear-gradient(
+                var(--designer-grid-bg-color)
+                    calc(
+                        var(--designer-grid-dot-space) -
+                            var(--designer-grid-dot-size)
+                    ),
+                transparent 1%
+            )
+            top,
+        var(--designer-grid-dot-color);
+    background-size: var(--designer-grid-dot-space)
+        var(--designer-grid-dot-space);
 }
 
 .page.A4 {
