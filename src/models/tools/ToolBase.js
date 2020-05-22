@@ -3,8 +3,9 @@ export class ToolBase {
 	 *
 	 * @param {String} id
 	 * @param {String} optionsPanel
+	 * @param {String} toolType
 	 */
-	constructor(id, optionsPanel) {
+	constructor(id, optionsPanel, toolType) {
 		/** @type{String} */
 		this.id = id;
 		/** @type {String} */
@@ -13,5 +14,11 @@ export class ToolBase {
 		this.width = 10;
 		/** @type {Number} Height in centimeters*/
 		this.height = 1;
+		/** @type {Number} X position in centimeters*/
+		this.positionX = 0;
+		/** @type {Number} Y position in centimeters*/
+		this.positionY = 0;
+		/** @type {String} */
+		this.toolType = toolType;
 	}
 }

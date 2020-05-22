@@ -44,11 +44,39 @@ export class DesignerService {
 
 	/**
 	 *
+	 * @param {Number} toolElementIndex
+	 */
+	static RestoreElement(toolElementIndex) {
+		let toolElement = store.state.elements[toolElementIndex];
+		const elementMounter = document.createElement("div");
+		elementMounter.id = toolElement.id;
+		document.querySelector("#page-body").appendChild(elementMounter);
+
+		switch (toolElement.toolType) {
+			case ToolElements.LABEL:
+				{
+					let toolComponent = new toolLabelComponent({
+						propsData: {
+							elementIndex: toolElementIndex,
+						},
+						store,
+					});
+
+					toolComponent.$mount(`#${toolElement.id}`);
+				}
+				break;
+			default:
+				throw new Error(`Cannot restore tool id [${toolElement.id}] with type [${toolElement.toolType}]!`);
+		}
+	}
+
+	/**
+	 *
 	 * @param {Number} pixels
 	 */
 	static ConvertPixelsToCentimeter(pixels) {
 		const dpi = 96 * window.devicePixelRatio;
-		return (pixels * 2.54) / dpi;
+		return Number(((pixels * 2.54) / dpi).toFixed(1));
 	}
 
 	/**

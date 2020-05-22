@@ -10,6 +10,7 @@ import "./plugins/registerComponents";
 
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
+Vue.prototype.APP_VERSION = "1.0.0";
 
 new Vue({
 	vuetify,

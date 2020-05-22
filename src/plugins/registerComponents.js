@@ -14,3 +14,6 @@ Vue.component(Toolbox.name, Toolbox);
 
 import ToolLabelProperties from "../components/options/ToolLabelProperties.vue";
 Vue.component(ToolLabelProperties.name, ToolLabelProperties);
+
+import DocumentOptions from "../components/options/DocumentOptions.vue";
+Vue.component(DocumentOptions.name, DocumentOptions);

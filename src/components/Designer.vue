@@ -26,7 +26,13 @@
 
 <script>
 export default {
-    name: "designer"
+    name: "designer",
+    watch: {
+        "$store.state.designer.gridSize": function () {
+            let root = document.documentElement;
+            root.style.setProperty("--designer-grid-dot-space", this.$store.state.designer.gridSize);
+        }
+    }
 }
 </script>
 

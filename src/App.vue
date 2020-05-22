@@ -2,14 +2,17 @@
     <v-app>
         <v-app-bar app color="primary" dark>
             <v-toolbar-title class="ml-0 pl-4">
-                <span>pdfmake Report Designer</span>
+                <span class="font-weight-thin">pdf</span>
+                <span class="font-weight-light">make</span>
+                <span>&nbsp;Report Designer&nbsp;</span>
+                <code class="overline secondary black--text elevation-0">v{{APP_VERSION}}</code>
             </v-toolbar-title>
             <v-spacer></v-spacer>
             <div>
-                <!-- <v-btn rounded color="info" class="mx-2">
-                    <v-icon class="mx-2">mdi-refresh</v-icon>Refresh
+                <v-btn rounded color="secondary" class="mx-2" @click="onSaveReport">
+                    <v-icon class="mx-2">mdi-download</v-icon>Save Report
                 </v-btn>
-                <v-btn rounded color="info" class="mx-2">
+                <!-- <v-btn rounded color="info" class="mx-2">
                     <v-icon class="mx-2">mdi-texture-box</v-icon>Add Zone
                 </v-btn>
                 <v-btn rounded color="info" class="mx-2">
@@ -38,6 +41,7 @@
                 </v-row>
             </v-container>
         </v-content>
+        <a id="downloadReport" style="display:none"></a>
     </v-app>
 </template>
 
@@ -50,6 +54,15 @@ export default {
     components: {
         Sidemenu,
         Designer
+    },
+    methods: {
+        onSaveReport() {
+            var data = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem("reportDesigner"));
+            var anchorElement = document.getElementById('downloadReport');
+            anchorElement.setAttribute("href", data);
+            anchorElement.setAttribute("download", `${this.$store.state.report.title}.json`);
+            anchorElement.click();
+        }
     }
 }
 </script>
