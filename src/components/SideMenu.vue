@@ -18,6 +18,12 @@
             </v-list-item-icon>
             <v-list-item-title>Toolbox</v-list-item-title>
         </v-list-item>
+        <v-list-item @click="onShowOption(option.GOOGE_FONTS)">
+            <v-list-item-icon>
+                <v-icon>mdi-format-size</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Google Fonts</v-list-item-title>
+        </v-list-item>
     </v-list>
 </template>
 

@@ -17,3 +17,6 @@ Vue.component(ToolLabelProperties.name, ToolLabelProperties);
 
 import DocumentOptions from "../components/options/DocumentOptions.vue";
 Vue.component(DocumentOptions.name, DocumentOptions);
+
+import GoogleFonts from "../components/options/GoogleFonts.vue";
+Vue.component(GoogleFonts.name, GoogleFonts);

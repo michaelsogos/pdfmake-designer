@@ -5,7 +5,7 @@
                 <span class="font-weight-thin">pdf</span>
                 <span class="font-weight-light">make</span>
                 <span>&nbsp;Report Designer&nbsp;</span>
-                <code class="overline secondary black--text elevation-0">v{{APP_VERSION}}</code>
+                <code class="overline secondary black--text elevation-0">{{getAppVersion()}}</code>
             </v-toolbar-title>
             <v-spacer></v-spacer>
             <div>
@@ -62,6 +62,9 @@ export default {
             anchorElement.setAttribute("href", data);
             anchorElement.setAttribute("download", `${this.$store.state.report.title}.json`);
             anchorElement.click();
+        },
+        getAppVersion() {
+            return `v${this.APP_VERSION}`;
         }
     }
 }

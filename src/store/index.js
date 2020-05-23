@@ -6,6 +6,7 @@ import $ from "./types";
 import { Designer } from "../models/Designer";
 import { DesignerService } from "../services/DesignerService";
 import { Report } from "../models/Report";
+import { FontDescriptor } from "../models/FontDescriptor";
 
 Vue.use(Vuex);
 
@@ -94,6 +95,23 @@ const store = new Vuex.Store({
 		 */
 		[$.mutations.REPORT_SET_PROPERTY](state, propertySetter) {
 			state.report[propertySetter.propertyName] = propertySetter.value;
+		},
+		/**
+		 *
+		 * @param {initialState} state
+		 * @param {import("../models/FontFile").FontFile} fontFile
+		 */
+		[$.mutations.REPORT_ADD_FONT](state, fontFile) {
+			let fontIndex = state.report.fonts.findIndex((font) => font.name == fontFile.fontName);
+			if (fontIndex >= 0) {
+				let fontDescriptor = state.report.fonts[fontIndex];
+				fontDescriptor[fontFile.face] = fontFile.base64;
+				state.report.fonts.splice(fontIndex, 1, ...[fontDescriptor]);
+			} else {
+				let newFontDescriptor = new FontDescriptor(fontFile.fontName);
+				newFontDescriptor[fontFile.face] = fontFile.base64;
+				state.report.fonts.push(newFontDescriptor);
+			}
 		},
 	},
 	actions: {

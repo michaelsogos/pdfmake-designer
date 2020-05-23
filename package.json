@@ -9,8 +9,9 @@
 	},
 	"dependencies": {
 		"@babel/polyfill": "7.4.4",
-		"@mdi/font": "5.2.45",
+		"@mdi/font": "*",
 		"animate.css": "4.1.0",
+		"axios": "0.19.2",
 		"core-js": "3.6.4",
 		"roboto-fontface": "*",
 		"vue": "2.6.11",

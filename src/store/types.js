@@ -16,5 +16,6 @@ module.exports = {
 		DESIGNER_SET_TOOLELEMENTPROPERTY: "mutationDesignerSetToolElementProperty",
 		APP_RESTORE_SAVEDSTATE: "mutationAppRestoreSavedState",
 		REPORT_SET_PROPERTY: "mutationReportSetProperty",
+		REPORT_ADD_FONT: "mutationReportAddFont",
 	},
 };
