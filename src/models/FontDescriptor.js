@@ -14,5 +14,13 @@ export class FontDescriptor {
 		this.italics = null;
 		/** @type {String} In base64*/
 		this.bolditalics = null;
+		/** @type {String} */
+		this.normalVariant = null;
+		/** @type {String} */
+		this.boldVariant = null;
+		/** @type {String} */
+		this.italicsVariant = null;
+		/** @type {String} */
+		this.bolditalicsVariant = null;
 	}
 }

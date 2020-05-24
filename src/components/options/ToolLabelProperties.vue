@@ -23,7 +23,7 @@
                 prepend-inner-icon="mdi-face"
                 @change="onChangeProperty('label',$event)"
             ></v-text-field>
-            <v-text-field
+            <!-- <v-text-field
                 :value="toolElement.width"
                 outlined
                 dense
@@ -32,13 +32,34 @@
                 prepend-inner-icon="mdi-face"
                 type="number"
                 @change="onChangeProperty('width',$event)"
-            ></v-text-field>
+            ></v-text-field>-->
+            <v-select
+                :items="installedFonts"
+                label="Font Family"
+                dense
+                outlined
+                color="secondary"
+                prepend-inner-icon="mdi-format-size"
+                :value="toolElement.fontFamily"
+                @change="onChangeProperty('fontFamily',$event)"
+            ></v-select>
+            <v-select
+                :items="installedFontVariants"
+                label="Font Face"
+                dense
+                outlined
+                color="secondary"
+                prepend-inner-icon="mdi-format-font"
+                :value="toolElement.fontFace"
+                @change="onChangeProperty('fontFace',$event)"
+            ></v-select>
         </div>
     </v-container>
 </template>
 <script>
 import $ from "../../store/types";
 import { ToolPropertySetter } from '../../models/ToolPropertySetter';
+import { FontFace } from '../../enums/FontFace';
 
 export default {
     name: "tool-label-properties",
@@ -49,16 +70,44 @@ export default {
         /** @return {import("../../models/tools/ToolLabel").ToolLabel} */
         toolElement() {
             return this.$store.state.elements[this.$store.state.selectedElementIndex];
+        },
+        installedFonts() {
+            return this.$store.state.report.fonts.map((/** @type {import("../../models/FontDescriptor").FontDescriptor}*/ item) => {
+                return item.name;
+            });
+        },
+        installedFontVariants() {
+            /** @type {import("../../models/FontDescriptor").FontDescriptor}*/
+            let fontDescriptor = this.$store.state.report.fonts.find((item) => item.name == this.toolElement.fontFamily);
+            if (fontDescriptor) {
+                let variants = [];
+                if (fontDescriptor.normalVariant) variants.push({ text: "Regular Font", value: FontFace.NORMAL });
+                if (fontDescriptor.boldVariant) variants.push({ text: "Bold Font", value: FontFace.BOLD });
+                if (fontDescriptor.italicsVariant) variants.push({ text: "Italic Font", value: FontFace.ITALIC });
+                if (fontDescriptor.bolditalicsVariant) variants.push({ text: "Bold-Italic Font", value: FontFace.BOLD_ITALIC });
+                return variants;
+            }
+            else
+                return [];
         }
     },
     methods: {
         onChangeProperty(propertyName, value) {
+            //Pre-elaboration of property value
             switch (propertyName) {
                 case "width":
                     value = parseFloat(value);
+                    break;
             }
 
             this.$store.commit($.mutations.DESIGNER_SET_TOOLELEMENTPROPERTY, new ToolPropertySetter(this.$store.state.selectedElementIndex, propertyName, value));
+
+            //Post-elaboration of property value
+            switch (propertyName) {
+                case "fontFamily":
+                    this.$store.commit($.mutations.DESIGNER_SET_TOOLELEMENTPROPERTY, new ToolPropertySetter(this.$store.state.selectedElementIndex, "fontFace", FontFace.NORMAL));
+                    break;
+            }
         }
     },
     mounted() {

@@ -7,6 +7,9 @@ import { Designer } from "../models/Designer";
 import { DesignerService } from "../services/DesignerService";
 import { Report } from "../models/Report";
 import { FontDescriptor } from "../models/FontDescriptor";
+import { FontFace } from "../enums/FontFace";
+import axios from "axios";
+import { FontFile } from "../models/FontFile";
 
 Vue.use(Vuex);
 
@@ -106,15 +109,89 @@ const store = new Vuex.Store({
 			if (fontIndex >= 0) {
 				let fontDescriptor = state.report.fonts[fontIndex];
 				fontDescriptor[fontFile.face] = fontFile.base64;
+				fontDescriptor[`${fontFile.face}Variant`] = fontFile.fontVariant;
 				state.report.fonts.splice(fontIndex, 1, ...[fontDescriptor]);
 			} else {
 				let newFontDescriptor = new FontDescriptor(fontFile.fontName);
 				newFontDescriptor[fontFile.face] = fontFile.base64;
+				newFontDescriptor[`${fontFile.face}Variant`] = fontFile.fontVariant;
 				state.report.fonts.push(newFontDescriptor);
+			}
+		},
+		/**
+		 *
+		 * @param {initialState} state
+		 * @param {import("../models/FontFile").FontFile} fontFile
+		 */
+		[$.mutations.REPORT_REMOVE_FONT](state, fontFile) {
+			let fontIndex = state.report.fonts.findIndex((font) => font.name == fontFile.fontName);
+			if (fontIndex >= 0) {
+				let fontDescriptor = state.report.fonts[fontIndex];
+
+				switch (fontFile.fontVariant) {
+					case fontDescriptor.normalVariant:
+						fontDescriptor.normal = null;
+						fontDescriptor.normalVariant = null;
+						state.report.fonts.splice(fontIndex, 1, ...[fontDescriptor]);
+						break;
+					case fontDescriptor.boldVariant:
+						fontDescriptor.bold = null;
+						fontDescriptor.boldVariant = null;
+						state.report.fonts.splice(fontIndex, 1, ...[fontDescriptor]);
+						break;
+					case fontDescriptor.italicsVariant:
+						fontDescriptor.italics = null;
+						fontDescriptor.italicsVariant = null;
+						state.report.fonts.splice(fontIndex, 1, ...[fontDescriptor]);
+						break;
+					case fontDescriptor.bolditalicsVariant:
+						fontDescriptor.bolditalics = null;
+						fontDescriptor.bolditalicsVariant = null;
+						state.report.fonts.splice(fontIndex, 1, ...[fontDescriptor]);
+						break;
+				}
 			}
 		},
 	},
 	actions: {
+		/**
+		 *
+		 * @param {import("vuex").ActionContext<initialState>} context
+		 * @param {String} gridSize
+		 */
+		async [$.actions.APP_INITIALIZE_REPORT](context) {
+			let fontDescriptor = context.state.report.fonts.find((item) => {
+				return item.name == "Roboto";
+			});
+			if (!fontDescriptor || !fontDescriptor.normalVariant)
+				axios
+					.get("https://www.googleapis.com/webfonts/v1/webfonts", { params: { key: this._vm.GOOGLE_API_SECRET } })
+					.then((response) => {
+						let googleFonts = response.data.items;
+						let robotoFont = googleFonts.find((item) => {
+							return item.family == "Roboto";
+						});
+
+						this.fontFaceSelector = false;
+						axios
+							.get(robotoFont.files["regular"], { responseType: "blob" })
+							.then(function(response) {
+								var reader = new window.FileReader();
+								reader.readAsDataURL(response.data);
+								reader.onload = function() {
+									let fontBase64 = reader.result;
+									let fontFile = new FontFile("Roboto", "regular", FontFace.NORMAL, fontBase64);
+									context.commit($.mutations.REPORT_ADD_FONT, fontFile);
+								};
+							})
+							.catch((err) => {
+								console.error(err);
+							});
+					})
+					.catch((err) => {
+						console.error(err);
+					});
+		},
 		/**
 		 *
 		 * @param {import("vuex").ActionContext<initialState>} context
@@ -145,22 +222,54 @@ const store = new Vuex.Store({
 		 * @param {import("vuex").ActionContext<initialState>} context
 		 * @param {initialState} savedState
 		 */
-		async [$.actions.DESIGNER_RESTORE_TOOLELEMENT](context, savedState) {
+		async [$.actions.APP_RESTORE_SAVEDSTATE](context, savedState) {
 			context.commit($.mutations.APP_RESTORE_SAVEDSTATE, savedState);
+
+			//Restore Font Face Style
+			for (let fontDescriptor of savedState.report.fonts) {
+				let fontVariants = [];
+				if (fontDescriptor.normalVariant) fontVariants.push(fontDescriptor.normalVariant);
+				if (fontDescriptor.boldVariant) fontVariants.push(fontDescriptor.boldVariant);
+				if (fontDescriptor.italicsVariant) fontVariants.push(fontDescriptor.italicsVariant);
+				if (fontDescriptor.bolditalicsVariant) fontVariants.push(fontDescriptor.bolditalicsVariant);
+
+				DesignerService.RestoreFontFaceStyle(fontDescriptor.name, fontVariants);
+			}
+
+			await context.dispatch($.actions.APP_INITIALIZE_REPORT);
+
+			//Restore Tool Element
 			for (let x = 0; x < savedState.elements.length; x++) {
 				DesignerService.RestoreElement(x);
 			}
 		},
 	},
 	getters: {
-		[$.getters.APP_GET_TRANSLATION]: (state) => (key) => {},
+		[$.getters.REPORT_GET_FONTVARIANT]: (state) => (fontFamily, fontFace) => {
+			let fontDescriptor = state.report.fonts.find((item) => {
+				return item.name == fontFamily;
+			});
+
+			switch (fontFace) {
+				case FontFace.NORMAL:
+					return fontDescriptor.normalVariant || "";
+				case FontFace.BOLD:
+					return fontDescriptor.boldVariant || "";
+				case FontFace.ITALIC:
+					return fontDescriptor.italicsVariant || "";
+				case FontFace.BOLD_ITALIC:
+					return fontDescriptor.bolditalicsVariant || "";
+				default:
+					return "";
+			}
+		},
 	},
 });
 
 if (Object.keys(localStorage).some((element) => element == "reportDesigner")) {
 	let savedState = JSON.parse(localStorage.getItem("reportDesigner"));
 	setTimeout(() => {
-		store.dispatch($.actions.DESIGNER_RESTORE_TOOLELEMENT, savedState);
+		store.dispatch($.actions.APP_RESTORE_SAVEDSTATE, savedState);
 	}, 0);
 }
 

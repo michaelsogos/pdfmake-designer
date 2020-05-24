@@ -44,7 +44,12 @@
                 <slot>
                     <div class="col-12">
                         <v-list v-if="selectedFont" color="secondary lighten-3">
-                            <v-list-item v-for="item in selectedFont.variants" :key="item">
+                            <v-list-item
+                                v-for="item in selectedFont.variants"
+                                :key="item"
+                                :input-value="getFontDownloadStatus(item)"
+                                active-class="primary lighten-3"
+                            >
                                 <v-list-item-content>
                                     <v-list-item-title :style="getFontStyle(item)">
                                         {{selectedFont.family}}
@@ -56,40 +61,22 @@
                                     <v-list-item-subtitle>{{getFontStyleDescription(item)}}</v-list-item-subtitle>
                                 </v-list-item-content>
                                 <v-list-item-action>
-                                    <v-dialog v-model="fontFaceSelector">
-                                        <template v-slot:activator="{ on }">
-                                            <v-btn icon color="primary" v-on="on">
-                                                <v-icon>mdi-plus</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <v-card>
-                                            <v-card-title>Select target font face</v-card-title>
-                                            <v-divider></v-divider>
-                                            <v-card-text>
-                                                <v-radio-group v-model="selectedFontFace" column>
-                                                    <v-radio
-                                                        v-for="fontFace in fontFaces"
-                                                        :key="fontFace.value"
-                                                        :label="fontFace.text"
-                                                        :value="fontFace.value"
-                                                    ></v-radio>
-                                                </v-radio-group>
-                                            </v-card-text>
-                                            <v-divider></v-divider>
-                                            <v-card-actions>
-                                                <v-btn
-                                                    color="blue darken-1"
-                                                    text
-                                                    @click="fontFaceSelector = false"
-                                                >Cancel</v-btn>
-                                                <v-btn
-                                                    color="blue darken-1"
-                                                    text
-                                                    @click="onAddFontVariant(item)"
-                                                >Continue</v-btn>
-                                            </v-card-actions>
-                                        </v-card>
-                                    </v-dialog>
+                                    <v-btn
+                                        icon
+                                        color="primary"
+                                        @click="onShowVariantDialog(item)"
+                                        v-if="getFontDownloadStatus(item) == false"
+                                    >
+                                        <v-icon>mdi-plus-circle</v-icon>
+                                    </v-btn>
+                                    <v-btn
+                                        icon
+                                        color="error darken-3"
+                                        @click="onRemoveFontVariant(item)"
+                                        v-else
+                                    >
+                                        <v-icon>mdi-minus-circle</v-icon>
+                                    </v-btn>
                                 </v-list-item-action>
                             </v-list-item>
                         </v-list>
@@ -102,6 +89,27 @@
                 </slot>
             </div>
         </div>
+        <v-dialog v-model="fontFaceSelector">
+            <v-card>
+                <v-card-title>Select target font face</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text>
+                    <v-radio-group v-model="selectedFontFace" column>
+                        <v-radio
+                            v-for="fontFace in fontFaces"
+                            :key="fontFace.value"
+                            :label="fontFace.text"
+                            :value="fontFace.value"
+                        ></v-radio>
+                    </v-radio-group>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                    <v-btn color="blue darken-1" text @click="fontFaceSelector = false">Cancel</v-btn>
+                    <v-btn color="blue darken-1" text @click="onAddFontVariant">Continue</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
@@ -119,7 +127,8 @@ export default {
         selectedFont: null,
         fontFaceSelector: false,
         selectedFontFace: null,
-        fontFaces: []
+        fontFaces: [],
+        selectedFontVariant: null
     }),
     methods: {
         onChangeFontSelector() {
@@ -133,9 +142,9 @@ export default {
         onFilterFontSelector(item, queryText) {
             return item.family.toLowerCase().includes(queryText.toLowerCase());
         },
-        onAddFontVariant(variant) {
+        onAddFontVariant() {
             let self = this;
-            let fontURL = this.selectedFont.files[variant];
+            let fontURL = this.selectedFont.files[this.selectedFontVariant];
             this.fontFaceSelector = false;
             axios.get(fontURL, { responseType: "blob" })
                 .then(function (response) {
@@ -143,12 +152,20 @@ export default {
                     reader.readAsDataURL(response.data);
                     reader.onload = function () {
                         let fontBase64 = reader.result;
-                        let fontFile = new FontFile(self.selectedFont.family, variant, self.selectedFontFace, fontBase64);
+                        let fontFile = new FontFile(self.selectedFont.family, self.selectedFontVariant, self.selectedFontFace, fontBase64);
                         self.$store.commit($.mutations.REPORT_ADD_FONT, fontFile);
                     };
                 }).catch(err => {
                     console.error(err);
                 });
+        },
+        onShowVariantDialog(variant) {
+            this.selectedFontVariant = variant;
+            this.fontFaceSelector = true;
+        },
+        onRemoveFontVariant(variant) {
+            let fontFile = new FontFile(this.selectedFont.family, variant);
+            this.$store.commit($.mutations.REPORT_REMOVE_FONT, fontFile);
         },
         loadGoogleFonts() {
             axios.get("https://www.googleapis.com/webfonts/v1/webfonts", { params: { key: this.GOOGLE_API_SECRET } }).then(response => {
@@ -221,6 +238,20 @@ export default {
         },
         getItemValue(item) {
             return item;
+        },
+        getFontDownloadStatus(variant) {
+            /** @type {import("../../models/FontDescriptor").FontDescriptor} */
+            let fontDescriptor = this.$store.state.report.fonts.find((item) => {
+                return item.name == this.selectedFont.family;
+            });
+
+            if (fontDescriptor)
+                if (fontDescriptor.normalVariant == variant || fontDescriptor.boldVariant == variant || fontDescriptor.italicsVariant == variant || fontDescriptor.bolditalicsVariant == variant)
+                    return true;
+                else
+                    return false;
+            else
+                return false;
         }
     },
     mounted() {

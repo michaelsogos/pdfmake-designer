@@ -12,7 +12,7 @@
         @dragstop="onDragStop"
         @resizestop="onResizeStop"
     >
-        <p>{{element.label}}</p>
+        <p :style="getFontStyle()">{{element.label}}</p>
     </vue-draggable-resizable>
 </template>
 
@@ -59,7 +59,24 @@ export default {
         getElementGrid() {
             let gridSizePixel = DesignerService.GetGridSizeInPixel(this.$store.state.designer.gridSize);
             return [gridSizePixel, gridSizePixel];
-        }
+        },
+        getFontStyle() {
+            let style = `font-family: "${this.element.fontFamily}"; `;
+            let fontVariant = this.$store.getters[$.getters.REPORT_GET_FONTVARIANT](this.element.fontFamily, this.element.fontFace);
+
+            if (fontVariant.includes("italic"))
+                style += "font-style: italic; ";
+            else
+                style += "font-style: normal; ";
+
+            let fontWeight = fontVariant.match(/\b100|\b200|\b300|\b400|\b500|\b600|\b700|\b800|\b900|\bbold|\bbolder|\blighter/g);
+            if (fontWeight)
+                style += `font-weight: ${fontWeight}; `;
+            else
+                style += "font-weight: normal; ";
+
+            return style;
+        },
     },
     mounted() {
     }

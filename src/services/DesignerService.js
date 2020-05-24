@@ -72,6 +72,20 @@ export class DesignerService {
 
 	/**
 	 *
+	 * @param {String} fontFamily
+	 * @param {String[]} fontVariants
+	 */
+	static RestoreFontFaceStyle(fontFamily, fontVariants) {
+		let fontResourceURL = `http://fonts.googleapis.com/css?family=${fontFamily}:${fontVariants.join(",")}`;
+		var fontLink = document.createElement("link");
+		fontLink.href = fontResourceURL;
+		fontLink.rel = "stylesheet";
+		fontLink.type = "text/css";
+		(document.head || document.documentElement).appendChild(fontLink);
+	}
+
+	/**
+	 *
 	 * @param {Number} pixels
 	 */
 	static ConvertPixelsToCentimeter(pixels) {

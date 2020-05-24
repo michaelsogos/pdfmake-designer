@@ -3,7 +3,37 @@
         <div class="h-panel-container">
             <div class="h-panel-header">
                 <slot name="header">
-                    <h1>Panel Header</h1>
+                    <v-toolbar dense class="elevation-0 grey lighten-1">
+                        <v-btn-toggle
+                            dense
+                            multiple
+                            class="mr-5"
+                            active-class="elevation-0 primary lighten-2"
+                        >
+                            <v-btn class="elevation-2">
+                                <v-icon>mdi-format-bold</v-icon>
+                            </v-btn>
+                            <v-btn class="elevation-2">
+                                <v-icon>mdi-format-italic</v-icon>
+                            </v-btn>
+                            <v-btn class="elevation-2">
+                                <v-icon>mdi-format-underline</v-icon>
+                            </v-btn>
+                        </v-btn-toggle>
+
+                        <v-btn class="elevation-2">
+                            <v-row align="center" class="flex-column" justify="center">
+                                <v-icon class="cols 12">mdi-format-color-text</v-icon>
+                                <v-sheet
+                                    tile
+                                    style="margin-top: -4px;"
+                                    height="4"
+                                    width="26"
+                                    color="purple"
+                                ></v-sheet>
+                            </v-row>
+                        </v-btn>
+                    </v-toolbar>
                 </slot>
             </div>
             <div class="h-panel-body">
