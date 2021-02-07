@@ -20,8 +20,10 @@
                 dense
                 label="Label"
                 color="secondary"
-                prepend-inner-icon="mdi-face"
+                prepend-inner-icon="mdi-format-text-variant"
+                append-icon="mdi-function-variant"
                 @change="onChangeProperty('label',$event)"
+                @click:append="onShowExpressionDialog"
             ></v-text-field>
             <!-- <v-text-field
                 :value="toolElement.width"
@@ -108,6 +110,9 @@ export default {
                     this.$store.commit($.mutations.DESIGNER_SET_TOOLELEMENTPROPERTY, new ToolPropertySetter(this.$store.state.selectedElementIndex, "fontFace", FontFace.NORMAL));
                     break;
             }
+        },
+        onShowExpressionDialog() {
+            this.$root.$emit("show-expression-dialog");
         }
     },
     mounted() {

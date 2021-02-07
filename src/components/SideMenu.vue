@@ -24,6 +24,12 @@
             </v-list-item-icon>
             <v-list-item-title>Google Fonts</v-list-item-title>
         </v-list-item>
+        <v-list-item @click="onShowOption(option.DATASOURCES)">
+            <v-list-item-icon>
+                <v-icon>mdi-database</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Data Sources</v-list-item-title>
+        </v-list-item>
     </v-list>
 </template>
 

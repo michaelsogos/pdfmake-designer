@@ -19,5 +19,6 @@ module.exports = {
 		REPORT_SET_PROPERTY: "mutationReportSetProperty",
 		REPORT_ADD_FONT: "mutationReportAddFont",
 		REPORT_REMOVE_FONT: "mutationReportRemoveFont",
+		DATASOURCE_ADD_DEFINITION: "mutationDatasourceAddDefinition",
 	},
 };

@@ -30,6 +30,8 @@ const initialState = {
 	elements: [],
 	/** @type {Number} */
 	selectedElementIndex: null,
+	/** @type {import("../models/DataSource").DataSource[]} */
+	datasources: [],
 };
 
 const store = new Vuex.Store({
@@ -151,6 +153,14 @@ const store = new Vuex.Store({
 						break;
 				}
 			}
+		},
+		/**
+		 *
+		 * @param {initialState} state
+		 * @param {import("../models/DataSource").DataSource} dataSource
+		 */
+		[$.mutations.DATASOURCE_ADD_DEFINITION](state, dataSource) {
+			state.datasources.push(dataSource);
 		},
 	},
 	actions: {

@@ -42,6 +42,18 @@
             </v-container>
         </v-content>
         <a id="downloadReport" style="display:none"></a>
+        <v-dialog v-model="showExpressionDialog" scrollable max-width="500px">
+            <v-card color="primary">
+                <v-card-title class="white--text">Expression Builder</v-card-title>
+                <v-card-text class="primary lighten-4">asd</v-card-text>
+              <v-divider></v-divider>
+                <v-card-actions class="primary lighten-4">
+                    <v-btn color="secondary" text>Close</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn color="secondary" text>Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-app>
 </template>
 
@@ -51,6 +63,9 @@ import Designer from "./components/Designer";
 
 export default {
     name: 'App',
+    data: () => ({
+        showExpressionDialog: false,
+    }),
     components: {
         Sidemenu,
         Designer
@@ -66,6 +81,13 @@ export default {
         getAppVersion() {
             return `v${this.APP_VERSION}`;
         }
+    },
+    mounted() {
+        let self = this;
+        this.$root.$on("show-expression-dialog", function () {
+            console.log("df");
+            self.showExpressionDialog = true;
+        });        
     }
 }
 </script>

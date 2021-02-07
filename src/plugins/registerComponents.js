@@ -20,3 +20,6 @@ Vue.component(DocumentOptions.name, DocumentOptions);
 
 import GoogleFonts from "../components/options/GoogleFonts.vue";
 Vue.component(GoogleFonts.name, GoogleFonts);
+
+import Datasources from "../components/options/DataSources.vue";
+Vue.component(Datasources.name, Datasources);
